@@ -230,3 +230,19 @@
 @media(max-width:600px){.teacher-page .roster-grid{grid-template-columns:1fr}}
 .game-error-inline{background:#f7dfc9;color:#663c2a!important;border-left:4px solid #c45b36;padding:10px 12px}
 .teacher-login{max-width:440px}.teacher-login input{display:block;width:100%;padding:12px;margin:13px 0;border:1px solid #a5b9a6;background:#fff}.teacher-login .primary{margin-top:5px}
+.comparison-mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+.comparison-mode-buttons button{background:#e8eadb;border:1px solid #acbda9;border-radius:4px;padding:10px;font:800 14px 'Barlow Condensed',sans-serif;letter-spacing:.03em}
+.comparison-mode-buttons button.selected{background:#f2c66e;border-color:#ad783b}
+.test-feedback{display:grid;gap:4px;background:#e2ecdd;border-left:4px solid #287a68;padding:10px 12px;margin:10px 0;font-size:12px;line-height:1.45}
+.test-feedback b{font:800 15px 'Barlow Condensed',sans-serif}
+.info-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.info-choice{display:flex;flex-direction:column;gap:8px;background:#e9eee3;border:1px solid #c4d0be;border-radius:4px;padding:13px;min-width:0}
+.info-choice.confirmed{background:#fff0c8;border-color:#c4924d}
+.info-choice>b{font:800 20px 'Barlow Condensed',sans-serif;text-transform:uppercase}
+.info-choice small{font-size:12px;line-height:1.4;color:#4d6658}
+.info-choice .text-button{margin-top:auto}
+.info-choice em{font:800 12px 'Barlow Condensed',sans-serif;color:#257365;font-style:normal;margin-top:auto}
+.info-values{display:grid;gap:5px;margin:8px 0 12px;font-size:12px}
+.info-values span{border-top:1px solid #cbd5c8;padding-top:6px}
+.info-values strong{display:block;font:800 13px 'Barlow Condensed',sans-serif}
+@media(max-width:700px){.comparison-mode-buttons,.info-choice-grid{grid-template-columns:1fr}}

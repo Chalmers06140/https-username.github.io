@@ -8,7 +8,7 @@ export function Slider({label,value,min,max,step=1,unit="",disabled=false,onChan
   const shown=unit===" min"&&value>=120?duration(value/1440):unit===" days"?`${Number.isInteger(value)?value.toLocaleString():value.toFixed(1)} ${value===1?"day":"days"}`:`${Number.isInteger(value)?value.toLocaleString():value.toFixed(1)}${unit}`;
   return <label className="slider"><span><b>{label}</b><strong>{shown}</strong></span><input type="range" min={min} max={max} step={step} value={value} disabled={disabled} onChange={e=>onChange(Number(e.target.value))}/></label>;
 }
-export function duration(daysValue:number){const minutes=Math.round(daysValue*1440),days=Math.floor(minutes/1440),hours=Math.floor(minutes%1440/60),rest=minutes%60;return [days&&`${days} ${days===1?"day":"days"}`,hours&&`${hours} h`,rest&&`${rest} min`].filter(Boolean).join(" ")||"0 min"}
+export function duration(daysValue:number){const minutes=Math.round(daysValue*1440),hours=Math.floor(minutes/60),rest=minutes%60;return [hours&&`${hours} h`,rest&&`${rest} min`].filter(Boolean).join(" ")||"0 min"}
 export function RailPlot({chosen,onChoose}:{chosen:number[];onChoose:(n:number)=>void}) {
   const X=(x:number)=>55+x/850*620,Y=(y:number)=>224-y/6000*195;
   return <div className="quote-plot"><svg viewBox="0 0 740 275" aria-label="Rail Combi price quotes. Click two points on the line.">
@@ -42,7 +42,7 @@ export function CostPlot({inputs}:{inputs:Inputs}) {
     <text x="65" y="21" className="graph-label">SEK</text><text x="741" y="385" textAnchor="end" className="graph-label">Distance between rail terminals (km)</text>
   </svg><div className="plot-legend"><span><i className="legend-original rail"/>Original rail freight</span><span><i className="legend-original road"/>Original truck freight</span><span><i className="legend-adjusted rail"/>Current rail price + carbon</span><span><i className="legend-adjusted road"/>Current truck price + carbon</span></div>
   <div className="critical-readout"><b>Original freight critical distance: {original.critical.toFixed(1)} km</b><b>Current freight-only critical distance: {freightCrossing===null?"No positive crossing":freightCrossing.toFixed(1)+" km"}</b><b>Current price critical distance incl. carbon: {adjustedLabel}</b></div>
-  <p className="micro">The solid lines include freight charges and SVEAB’s selected carbon charge. The carbon charge changes the slope because emissions grow with distance. Waiting days and storage are excluded from this graph; they appear in the bill below.</p></div>;
+  <p className="micro">The solid lines include freight charges and SVEAB’s selected carbon charge. The carbon charge changes the slope because emissions grow with distance. Waiting time and storage are excluded from this graph; they appear in the bill below.</p></div>;
 }
 export function Sensitivity({inputs}:{inputs:Inputs}) {
   const oldRail=evaluate(inputs,"rail"),oldRoad=evaluate(inputs,"road"),oldCritical=pricedCriticalDistance(inputs);
