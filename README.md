@@ -2,9 +2,9 @@
 
 This repository contains the seminar game for GitHub Pages. The publishable website is in [`docs/`](docs/): `docs/index.html`, `docs/assets/`, and separate `emergency/` and `teacher/` pages. The editable React source is in `web/`. No ChatGPT account is needed to play.
 
-## Publish the website
+## Live website
 
-In GitHub, open **Settings → Pages**. Select **Deploy from a branch**, branch **main**, folder **/docs**, then save. The expected student link is:
+GitHub Pages is enabled from branch **main**, folder **/docs**. The student link is:
 
 `https://chalmers06140.github.io/https-username.github.io/`
 
@@ -12,9 +12,9 @@ The emergency link, which needs no name or group assignment, is:
 
 `https://chalmers06140.github.io/https-username.github.io/emergency/`
 
-The emergency game works as soon as Pages publishes. Group assignment and the TA roster need the small service in `worker/`, because GitHub Pages cannot store a shared roster or manage students.
+The emergency game needs no name or group assignment. Group assignment and the TA roster use the existing SVEAB seminar service at `https://sveab-rail-or-road.captivatingaisle2.chatgpt.site`, configured in `docs/config.js` and `web/public/config.js`. The student link itself does not contain “chatgpt”. The TA access code is stored as a secret in that service, not in this repository.
 
-## Set up group assignment and TA roster
+## Optional: move the group service to your own Cloudflare account
 
 1. Install Node.js 22 or newer. In `worker/`, run `npm install`, then `npx wrangler login` to connect your Cloudflare account.
 2. Run `npx wrangler d1 create sveab-groups`. Copy its `database_id` into `worker/wrangler.toml`, replacing `REPLACE_WITH_D1_DATABASE_ID`.
@@ -32,4 +32,4 @@ Use the GitHub Pages student and emergency links above in Canvas and the present
 
 ## Editing the game
 
-Change files in `web/src/`, run `npm run build`, then commit and push the changed source and `docs/`. Do not edit the generated files in `docs/assets/` directly. The API service code is in `worker/src/index.js`; redeploy it after a change. The SVEAB data and scenario assumptions are in `web/src/model.ts`. Student work remains in each browser's local storage; the shared service stores the names or nicknames, group numbers, seats and join times.
+Change files in `web/src/`, run `npm run build`, then commit and push the changed source and `docs/`. Do not edit the generated files in `docs/assets/` directly. The optional independent API service code is in `worker/src/index.js`. The SVEAB data and scenario assumptions are in `web/src/model.ts`. Student work remains in each browser's local storage; the shared service stores the names or nicknames, group numbers, seats and join times.
