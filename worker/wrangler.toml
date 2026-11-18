@@ -1,0 +1,12 @@
+name = "sveab-group-service"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://chalmers06140.github.io"
+LOCAL_ORIGIN = "http://localhost:4173"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sveab-groups"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
