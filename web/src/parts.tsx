@@ -1,8 +1,8 @@
 "use client";
 import { CASE, CASE_CONTROLS, POINTS, baseline, criticalDistance, pricedCriticalDistance, evaluate, money, type CaseControl, type Inputs, type Route } from "./model";
 
-export function Field({label,value,onChange,unit}:{label:string;value:string;onChange:(v:string)=>void;unit?:string}) {
-  return <label className="field"><span>{label}</span><div className="input-wrap"><input inputMode="decimal" value={value} onChange={e=>onChange(e.target.value)}/>{unit&&<em>{unit}</em>}</div></label>;
+export function Field({label,value,onChange,unit,hint}:{label:string;value:string;onChange:(v:string)=>void;unit?:string;hint?:string}) {
+  return <label className="field"><span>{label}</span>{hint&&<small>{hint}</small>}<div className="input-wrap"><input inputMode="decimal" value={value} onChange={e=>onChange(e.target.value)}/>{unit&&<em>{unit}</em>}</div></label>;
 }
 export function Slider({label,value,min,max,step=1,unit="",disabled=false,onChange}:{label:string;value:number;min:number;max:number;step?:number;unit?:string;disabled?:boolean;onChange:(v:number)=>void}) {
   const shown=unit===" min"&&value>=120?duration(value/1440):unit===" days"?`${Number.isInteger(value)?value.toLocaleString():value.toFixed(1)} ${value===1?"day":"days"}`:`${Number.isInteger(value)?value.toLocaleString():value.toFixed(1)}${unit}`;
@@ -17,7 +17,7 @@ export function RailPlot({chosen,onChoose}:{chosen:number[];onChoose:(n:number)=
     <path d={POINTS.map((p,i)=>(i?"L":"M")+X(p.x)+" "+Y(p.y)).join(" ")} fill="none" stroke="#218071" strokeWidth="4"/>
     {POINTS.map((p,i)=><g key={i}><g role="button" tabIndex={0} aria-label={"Select "+p.x+" km, "+money(p.y)} onClick={()=>onChoose(i)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onChoose(i)}}} className="quote-dot"><circle cx={X(p.x)} cy={Y(p.y)} r="17" fill="transparent"/><circle cx={X(p.x)} cy={Y(p.y)} r={chosen.includes(i)?12:9} fill={chosen.includes(i)?"#f2bf62":"#f8f5e9"} stroke="#164a40" strokeWidth="3"/></g><text x={X(p.x)} y="246" textAnchor="middle" className="graph-label">{p.x}</text></g>)}
     <text x="368" y="271" textAnchor="middle" className="graph-label">Distance between Rail Combi terminals (km)</text>
-  </svg><div className="selected-quotes">{chosen.length?chosen.map(i=><b key={i}>{POINTS[i].x} km = {money(POINTS[i].y)}</b>):<span>No points selected yet.</span>}</div><p className="micro">Click two different dots on the line. Use the displayed prices to calculate slope and intercept.</p></div>;
+  </svg><div className="selected-quotes">{chosen.length?chosen.map(i=><b key={i}>{POINTS[i].x} km = {money(POINTS[i].y)}</b>):<span>No points selected yet.</span>}</div><p className="micro">Click two different dots on the line. Use their distances and prices to find the price per added kilometre and the starting price.</p></div>;
 }
 export function Scene({route,dispatched}:{route:Route|null;dispatched:boolean}) {
   return <div className={"scene "+(dispatched?"departed ":"")+"route-"+(route||"none")}><div className="scene-sky"><span className="sun"/><span className="cloud one"/><span className="cloud two"/></div><div className="station"><span className="station-sign">SVEAB YARD</span><span className="station-window"/><span className="station-window"/></div><div className="gantry"><span className="gantry-board">23:00 <b>FREIGHT / 04</b></span></div><div className="platform"/><div className="railtrack main"/><div className="railtrack spur"/><div className="signal"><i/></div><div className="train"><div className="locomotive"><span className="cab-window"/><span className="nose"/><span className="headlamp"/></div><div className="wagon"><span>FREIGHT</span></div><div className="wagon second"><span>CONTAINER</span></div></div><div className="truck"><span className="truck-box">CARGO</span><span className="truck-cab"/></div><div className="scene-caption">{dispatched?(route==="rail"?"RAIL DISPATCHED":"ROAD DISPATCHED"):"CHOOSE A ROUTE"}</div></div>;

@@ -9,17 +9,17 @@ export const ASEK:Record<Product,{rate:number;label:string}>={
   chemicals:{rate:8.3525240037,label:"chemical products"},machinery:{rate:78.1851123238,label:"machinery"},
   equipment:{rate:39.7676625894,label:"transport equipment"}
 };
-export type Inputs={distance:number;scenario:number;railDelay:number;roadDelay:number;truckPremium:number;railPremium:number;fuelShock:number;fuelShare:number;passThrough:number;roadExtraKm:number;railExtraKm:number;railDetourKm:number;railFee:number;storage:number;carbonPrice:number;deadline:number;cargoValue:number;holdingRate:number};
+export type Inputs={distance:number;scenario:number;railDelay:number;roadDelay:number;truckPremium:number;railPremium:number;roadExtraKm:number;railExtraKm:number;railDetourKm:number;railFee:number;storage:number;carbonPrice:number;deadline:number;cargoValue:number;holdingRate:number};
 export type CaseControl={key:keyof Inputs;label:string;min:number;max:number;step:number;unit:string;testStep:number;scale?:number};
 export const CASE_CONTROLS:CaseControl[][]=[
   [{key:"railDelay",label:"Hours waiting for a train",min:0,max:720,step:4,unit:" h",testStep:4,scale:24},{key:"storage",label:"Storage per waiting hour",min:0,max:20,step:0.5,unit:" SEK/h",testStep:2},{key:"truckPremium",label:"Truck booking premium",min:0,max:80,step:1,unit:"%",testStep:10}],
-  [{key:"fuelShock",label:"Diesel price increase",min:0,max:80,step:0.1,unit:"%",testStep:10},{key:"fuelShare",label:"Fuel share of truck quote",min:0,max:70,step:1,unit:"%",testStep:10},{key:"passThrough",label:"Share charged to SVEAB",min:0,max:100,step:5,unit:"%",testStep:20}],
+  [{key:"truckPremium",label:"Truck quote increase for SVEAB",min:0,max:30,step:0.1,unit:"%",testStep:5},{key:"railDelay",label:"Extra wait for rail",min:0,max:48,step:1,unit:" h",testStep:4,scale:24}],
   [{key:"roadExtraKm",label:"Road detour",min:0,max:150,step:5,unit:" km",testStep:20},{key:"roadDelay",label:"Additional road time",min:0,max:2880,step:5,unit:" min",testStep:60,scale:1440},{key:"railDelay",label:"Rail terminal wait",min:0,max:120,step:4,unit:" h",testStep:4,scale:24}],
   [{key:"railDetourKm",label:"Extra rail kilometres",min:0,max:180,step:5,unit:" km",testStep:20},{key:"railDelay",label:"Rail slot wait",min:0,max:240,step:4,unit:" h",testStep:4,scale:24},{key:"truckPremium",label:"Truck capacity premium",min:0,max:80,step:1,unit:"%",testStep:10}]
 ];
 export type Inquiry={label:string;purpose:string;resolves?:number;responses:[{text:string;update:Partial<Inputs>;bounds?:[number,number]},{text:string;update:Partial<Inputs>;bounds?:[number,number]},{text:string;update:Partial<Inputs>;bounds?:[number,number]}]};
 export type Reveal={text:string;update:Partial<Inputs>};
-export type Scenario={title:string;short:string;reported:string;source:string;sourceLabel:string;sourceNote:string;additionalSource?:string;additionalLabel?:string;product:Product;transfer:string;question:string;unknowns:string[];starting:Partial<Inputs>;range:{key:keyof Inputs;label:string;low:number;high:number;unit:string};inquiries:[Inquiry,Inquiry,Inquiry];reveals:[Reveal,Reveal,Reveal];action?:{label:string;route:Route;update:Partial<Inputs>;explanation:string};outcome:Record<Route,string>};
+export type Scenario={title:string;short:string;reported:string;source:string;sourceLabel:string;sourceNote:string;additionalSource?:string;additionalLabel?:string;product:Product;transfer:string;question:string;unknowns:string[];starting:Partial<Inputs>;range:{key:keyof Inputs;label:string;low:number;high:number;unit:string};inquiries:Inquiry[];reveals:[Reveal,Reveal,Reveal];action?:{label:string;route:Route;update:Partial<Inputs>;explanation:string};outcome:Record<Route,string>};
 export const SCENARIOS:Scenario[]=[
   {
     title:"German rail strike",short:"Rail service · January 2024",
@@ -27,7 +27,7 @@ export const SCENARIOS:Scenario[]=[
     source:"https://www.erfarail.eu/news/press-release-strikes-in-germany-db-infrago-must-fulfil-its-sovereign-duty-as-an-infrastructure-manager",sourceLabel:"European Rail Freight Association, English press release",
     sourceNote:"ERFA, 23 January 2024: six days of announced industrial action, with disruption to freight corridors. The duration of a SVEAB delay below is a teaching assumption, not an observed effect of this strike.",
     product:"equipment",transfer:"Imagine the same SVEAB network facing a short rail service interruption. A delayed train raises storage and delivery risk; scarce replacement trucks carry a premium. The freight rail quote itself is unchanged.",
-    question:"Which information should you confirm before choosing a route, and which range can you accept?",
+    question:"How long would you wait for a train before paying extra for a replacement truck?",
     unknowns:["Train departure time","Replacement truck price and availability","Storage rate"],
     starting:{railDelay:5,roadDelay:1,truckPremium:20,storage:5},
     range:{key:"truckPremium",label:"Possible truck booking premium",low:15,high:55,unit:"%"},
@@ -56,32 +56,28 @@ export const SCENARIOS:Scenario[]=[
     title:"EU diesel price rise",short:"Truck tariff · June 2022",
     reported:"Eurostat reported EU consumer diesel prices 45.2% higher year on year in June 2022.",
     source:"https://ec.europa.eu/eurostat/en/web/products-eurostat-news/w/ddn-20241008-2",sourceLabel:"Eurostat fuel price report",
-    sourceNote:"Eurostat, 8 October 2024: diesel +45.2% in June 2022 year on year. This is a fuel price change, not a freight tariff. All fuel shares and contract terms below are teaching assumptions.",
-    product:"equipment",transfer:"For SVEAB, the truck carrier may pass part of its higher fuel cost on to SVEAB. Rail Combi's quote does not acquire a surcharge in this case. The critical distance depends on the contract pass-through, which is initially unknown.",
-    question:"Does the full range of possible fuel surcharges change the conclusion, or is rail still cheaper?",
-    unknowns:["Share of fuel increase charged to SVEAB","Fuel share of the truck quote","Whether the rail slot meets the delivery promise"],
-    starting:{fuelShock:45.2,fuelShare:35,passThrough:50},
-    range:{key:"passThrough",label:"Fuel increase charged to SVEAB",low:0,high:100,unit:"%"},
+    sourceNote:"Eurostat reported a 45.2% rise in consumer diesel prices. The percentage increase in SVEAB's truck quote is a separate classroom assumption.",
+    product:"equipment",transfer:"Imagine the truck carrier raises its quote to SVEAB after diesel prices rise. The rail quote stays the same, although the train could still be delayed.",
+    question:"At your chosen shipment distance, how large would the truck quote increase need to be before you would switch routes?",
+    unknowns:["Increase in the price SVEAB pays for trucking","Additional wait for rail"],
+    starting:{truckPremium:7.9},
+    range:{key:"truckPremium",label:"Possible truck quote increase",low:0,high:16.1,unit:"%"},
     inquiries:[
-      {label:"Fuel surcharge",purpose:"Confirm the share passed on to SVEAB.",responses:[
-        {text:"The carrier confirms no fuel surcharge for this shipment.",update:{passThrough:0},bounds:[0,20]},
-        {text:"The carrier confirms that 40% of the fuel increase will be passed on.",update:{passThrough:40},bounds:[25,55]},
-        {text:"The carrier confirms that 85% of the fuel increase will be passed on.",update:{passThrough:85},bounds:[60,90]}]},
-      {label:"Fuel share",purpose:"Confirm the fuel share of the truck quote.",responses:[
-        {text:"Procurement estimates that fuel accounts for 30% of the truck quote.",update:{fuelShare:30}},
-        {text:"Procurement estimates that fuel accounts for 35% of the truck quote.",update:{fuelShare:35}},
-        {text:"Procurement estimates that fuel accounts for 42% of the truck quote.",update:{fuelShare:42}}]},
+      {label:"Truck quote",purpose:"Confirm how much the carrier will raise the price SVEAB pays.",responses:[
+        {text:"The carrier keeps the original truck quote.",update:{truckPremium:0}},
+        {text:"The carrier raises the truck quote by 6.3%.",update:{truckPremium:6.3}},
+        {text:"The carrier raises the truck quote by 16.1%.",update:{truckPremium:16.1}}]},
       {label:"Rail departure",purpose:"Confirm the additional wait for rail.",responses:[
-        {text:"Rail Combi expects no additional wait. Its freight quote is unchanged.",update:{railDelay:0}},
-        {text:"Rail Combi expects 12 hours of additional wait. Its freight quote is unchanged.",update:{railDelay:0.5}},
-        {text:"Rail Combi expects 24 hours of waiting. Its freight quote is unchanged.",update:{railDelay:1}}]}
+        {text:"Rail Combi expects no additional wait.",update:{railDelay:0}},
+        {text:"Rail Combi expects 12 hours of additional wait.",update:{railDelay:0.5}},
+        {text:"Rail Combi expects 24 hours of additional wait.",update:{railDelay:1}}]}
     ],
     reveals:[
-      {text:"The final truck invoice passes on none of the fuel rise. Fuel is 30% of its original quote; rail has no extra wait.",update:{passThrough:0,fuelShare:30,railDelay:0}},
-      {text:"The final truck invoice passes on 40% of the fuel rise. Fuel is 35% of its original quote; rail waits 12 hours.",update:{passThrough:40,fuelShare:35,railDelay:0.5}},
-      {text:"The final truck invoice passes on 85% of the fuel rise. Fuel is 42% of its original quote; rail waits 24 hours.",update:{passThrough:85,fuelShare:42,railDelay:1}}
+      {text:"The truck quote stays the same and rail has no extra wait.",update:{truckPremium:0,railDelay:0}},
+      {text:"The truck quote rises by 6.3% and rail waits another 12 hours.",update:{truckPremium:6.3,railDelay:0.5}},
+      {text:"The truck quote rises by 16.1% and rail waits another 24 hours.",update:{truckPremium:16.1,railDelay:1}}
     ],
-    outcome:{rail:"Rail keeps its original freight quote; a service wait may still matter.",road:"The truck invoice depends on the carrier's fuel share and contract pass-through."}
+    outcome:{rail:"Rail keeps its original freight quote; a service wait may still matter.",road:"The carrier's surcharge raises the truck quote SVEAB pays."}
   },
   {
     title:"E6 Stenungsund landslide",short:"Road detour · September 2023",
@@ -90,7 +86,7 @@ export const SCENARIOS:Scenario[]=[
     additionalSource:"https://www.svensktnaringsliv.se/bilder_och_dokument/rapporter/5gk1nl_pm_-_samhallsekonomiska_effekter_av_jordskredet_vid_e6_stenungssu_1204074.html/PM_-_Samhallsekonomiska_effekter_av_jordskredet_vid_E6_Stenungssund.pdf",additionalLabel:"WSP detour study, Swedish PDF",
     sourceNote:"Investigation Authority: landslide on 23 September 2023. WSP, 17 October 2023, p. 7: roughly 30 extra kilometres and 25 minutes for a studied heavy-vehicle route. SVEAB's detour and congestion are hypothetical.",
     product:"equipment",transfer:"Place the SVEAB shipment under a road closure of this kind. The signed detour changes truck kilometres, price and emissions; traffic may add time beyond the distance-based estimate. Rail may use another terminal, at a handling and local haulage cost.",
-    question:"Would you choose a shorter bill or more reliable delivery when the final congestion time is unknown?",
+    question:"How much extra road time would make you switch to rail?",
     unknowns:["Road detour and congestion","Rail terminal plan","Cargo value tied up in transit"],
     starting:{roadExtraKm:30,roadDelay:25/1440,railDelay:1,cargoValue:250000,holdingRate:12},
     range:{key:"roadExtraKm",label:"Possible truck detour",low:20,high:65,unit:" km"},
@@ -121,7 +117,7 @@ export const SCENARIOS:Scenario[]=[
     source:"https://news.sbb.ch/en/019d7b76-dea8-7bc7-a9d2-8b70f60dc7b9/gotthard-base-tunnel-passenger-information",sourceLabel:"Swiss Federal Railways, English account",
     sourceNote:"SBB, updated 2 September 2024: derailment on 10 August 2023 and prolonged restricted rail operation. The extra distance, slot wait and road quote below are invented for SVEAB, not Gotthard measurements.",
     product:"equipment",transfer:"Imagine a physical rail closure on the SVEAB network. Rail may travel farther and wait for a diverted slot, while truck remains available at a possible capacity premium. Unlike a strike, extra rail kilometres directly change the rail cost line and emissions.",
-    question:"If the rail route is longer but its final slot is uncertain, which fact should you confirm before deciding?",
+    question:"Would rail still be your choice if the train had to travel farther?",
     unknowns:["Length of the usable rail diversion","Date of a diverted rail slot","Replacement truck capacity premium"],
     starting:{railDetourKm:80,railDelay:3,truckPremium:20,storage:5},
     range:{key:"railDetourKm",label:"Possible extra rail distance",low:0,high:150,unit:" km"},
@@ -147,11 +143,11 @@ export const SCENARIOS:Scenario[]=[
     outcome:{rail:"Rail may use a longer diversion, with a scarce slot and storage during the wait.",road:"The truck avoids the rail closure but its capacity premium may rise."}
   }
 ];
-export const BASE_INPUTS:Inputs={distance:Math.round(baseline(0).critical*10)/10,scenario:0,railDelay:0,roadDelay:0,truckPremium:0,railPremium:0,fuelShock:0,fuelShare:35,passThrough:100,roadExtraKm:0,railExtraKm:0,railDetourKm:0,railFee:0,storage:0,carbonPrice:0,deadline:2.5,cargoValue:250000,holdingRate:12};
+export const BASE_INPUTS:Inputs={distance:Math.round(baseline(0).critical*10)/10,scenario:0,railDelay:0,roadDelay:0,truckPremium:0,railPremium:0,roadExtraKm:0,railExtraKm:0,railDetourKm:0,railFee:0,storage:0,carbonPrice:0,deadline:2.5,cargoValue:250000,holdingRate:12};
 export function scenarioInputs(index:number,distance:number):Inputs{return {...BASE_INPUTS,...SCENARIOS[index].starting,scenario:index,distance}}
 export function baseline(distance:number){const railSlope=6.5,railIntercept=550+2*CASE.haulage+2*CASE.lift,roadSlope=CASE.truckRate*CASE.reposition,roadIntercept=roadSlope*(CASE.supplierKm+CASE.destinationKm);return {railSlope,railIntercept,roadSlope,roadIntercept,rail:railSlope*distance+railIntercept,road:roadSlope*distance+roadIntercept,critical:(railIntercept-roadIntercept)/(roadSlope-railSlope)}}
 export type OptionResult={route:Route;freightInvoice:number;waitingCharge:number;invoice:number;normalDays:number;additionalDays:number;days:number;co2kg:number;cargoHoldingCost:number;delayValue:number;delayCost:number;carbonCost:number;decisionCost:number;withinDeadline:boolean;note:string};
-export function evaluate(i:Inputs,route:Route):OptionResult{const b=baseline(i.distance),event=SCENARIOS[i.scenario],roadRate=CASE.truckRate*CASE.reposition,roadKm=i.distance+CASE.supplierKm+CASE.destinationKm+i.roadExtraKm,railKm=i.distance+i.railDetourKm,railQuote=(b.railSlope*railKm+550)*(1+i.railPremium/100),railFreight=railQuote+2*CASE.haulage+2*CASE.lift+i.railFee,roadFreight=roadRate*roadKm*(1+i.truckPremium/100+i.fuelShock/100*i.fuelShare/100*i.passThrough/100),freightInvoice=route==="rail"?railFreight:roadFreight,waitingCharge=route==="rail"?i.railDelay*24*i.storage:0,invoice=freightInvoice+waitingCharge,normalDays=route==="rail"?2:1,additionalDays=route==="rail"?i.railDelay:i.roadDelay,days=normalDays+additionalDays,co2kg=CASE.weight*(route==="rail"?railKm*0.004+(CASE.supplierKm+CASE.destinationKm+i.railExtraKm)*0.07:roadKm*CASE.reposition*0.07),cargoHoldingCost=i.cargoValue*i.holdingRate/100*days/365,delayValue=ASEK[event.product].rate*CASE.weight*24,delayCost=additionalDays*delayValue,carbonCost=co2kg/1000*i.carbonPrice,decisionCost=invoice+carbonCost;return {route,freightInvoice,waitingCharge,invoice,normalDays,additionalDays,days,co2kg,cargoHoldingCost,delayValue,delayCost,carbonCost,decisionCost,withinDeadline:days<=i.deadline,note:event.outcome[route]}}
+export function evaluate(i:Inputs,route:Route):OptionResult{const b=baseline(i.distance),event=SCENARIOS[i.scenario],roadRate=CASE.truckRate*CASE.reposition,roadKm=i.distance+CASE.supplierKm+CASE.destinationKm+i.roadExtraKm,railKm=i.distance+i.railDetourKm,railQuote=(b.railSlope*railKm+550)*(1+i.railPremium/100),railFreight=railQuote+2*CASE.haulage+2*CASE.lift+i.railFee,roadFreight=roadRate*roadKm*(1+i.truckPremium/100),freightInvoice=route==="rail"?railFreight:roadFreight,waitingCharge=route==="rail"?i.railDelay*24*i.storage:0,invoice=freightInvoice+waitingCharge,normalDays=route==="rail"?2:1,additionalDays=route==="rail"?i.railDelay:i.roadDelay,days=normalDays+additionalDays,co2kg=CASE.weight*(route==="rail"?railKm*0.004+(CASE.supplierKm+CASE.destinationKm+i.railExtraKm)*0.07:roadKm*CASE.reposition*0.07),cargoHoldingCost=i.cargoValue*i.holdingRate/100*days/365,delayValue=ASEK[event.product].rate*CASE.weight*24,delayCost=additionalDays*delayValue,carbonCost=co2kg/1000*i.carbonPrice,decisionCost=invoice+carbonCost;return {route,freightInvoice,waitingCharge,invoice,normalDays,additionalDays,days,co2kg,cargoHoldingCost,delayValue,delayCost,carbonCost,decisionCost,withinDeadline:days<=i.deadline,note:event.outcome[route]}}
 function crossing(i:Inputs,includeCarbon:boolean){const value=(distance:number,route:Route)=>{const result=evaluate({...i,distance},route);return result.freightInvoice+(includeCarbon?result.carbonCost:0)},r0=value(0,"rail"),t0=value(0,"road"),denominator=(value(1,"road")-t0)-(value(1,"rail")-r0);if(Math.abs(denominator)<1e-8)return null;const x=(r0-t0)/denominator;return Number.isFinite(x)&&x>=0?x:null}
 export function criticalDistance(i:Inputs){return crossing(i,false)}
 export function pricedCriticalDistance(i:Inputs){return crossing(i,true)}
