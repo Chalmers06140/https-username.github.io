@@ -28,8 +28,12 @@ The TA roster is at `/teacher/`. Enter the private TA access code there to move 
 
 ## Links and QR codes for the seminar
 
-Use the GitHub Pages student and emergency links above in Canvas and the presentation. New QR images for both are in `seminar/`. The earlier ChatGPT-hosted links and QR codes point to the old website.
+Use the GitHub Pages student and emergency links above in Canvas and the [seminar PowerPoint](seminar/SVEAB%20Seminar%20-%20GitHub%20Pages.pptx). The QR images for both are in `seminar/`.
+
+Students register once by phone or computer. When the roster shows their group number, the group opens its worksheet on one computer using the copied group link or the group number under **Already registered? Open your group worksheet**. Opening the worksheet does not add a roster entry. The group number labels the worksheet, and progress is saved in the browser used to open it. A second device can open an independent worksheet.
+
+Task 2 has the shared Data Set 1 inputs. Ask groups to present their two-route sketch, calculation and geographic interpretation. In Task 3, groups can test a variable and optionally make a route decision before revealing uncertain conditions. The PowerPoint and game use the same discussion questions.
 
 ## Editing the game
 
-Change files in `web/src/`, run `npm run build`, then commit and push the changed source and `docs/`. Do not edit the generated files in `docs/assets/` directly. The optional independent API service code is in `worker/src/index.js`. The SVEAB data and scenario assumptions are in `web/src/model.ts`. Student work remains in each browser's local storage; the shared service stores the names or nicknames, group numbers, seats and join times.
+Change files in `web/src/`, run `npm run build`, then commit and push the changed source and `docs/`. Do not edit the generated files in `docs/assets/` directly. The optional independent API service code is in `worker/src/index.js`. The SVEAB data and scenario assumptions are in `web/src/model.ts`. Each browser stores its own worksheet. The shared group service stores the names or nicknames, group numbers, seats and join times.

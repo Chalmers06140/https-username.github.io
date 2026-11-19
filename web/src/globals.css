@@ -246,3 +246,35 @@
 .info-values span{border-top:1px solid #cbd5c8;padding-top:6px}
 .info-values strong{display:block;font:800 13px 'Barlow Condensed',sans-serif}
 @media(max-width:700px){.comparison-mode-buttons,.info-choice-grid{grid-template-columns:1fr}}
+
+.task-brief{margin-bottom:19px}
+.task-brief h2,.task-brief h3{margin-top:0}
+.task-brief-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.task-brief-grid>div{padding:14px;background:#e7eddf;border-top:3px solid #29786a}
+.task-brief-grid ul{padding-left:18px}
+.task-brief-grid li+li{margin-top:6px}
+.task-brief summary{cursor:pointer;font-weight:700}
+.entry-grid .field{align-content:start}
+.entry-grid .field small{display:block;color:var(--muted);margin:4px 0 6px}
+@media(max-width:760px){.task-brief-grid{grid-template-columns:1fr}}
+
+.handoff-actions,.scenario-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+.handoff-actions a{text-decoration:none;display:inline-block}
+.computer-entry{border-top:1px solid var(--line);margin:16px 0;padding-top:12px}
+.computer-entry summary,.variable-glossary summary,.decision-exercise>summary,.case-intro summary{cursor:pointer;font-weight:700}
+.computer-entry form{display:flex;gap:12px;align-items:end;margin:12px 0}
+.computer-entry .field{flex:1;margin:0;min-width:0}
+.event-card{min-height:0}
+.event-card .primary{margin-top:auto}
+.variable-glossary dl{display:grid;grid-template-columns:minmax(135px,1fr) minmax(0,3fr);gap:10px 16px;font-size:14px;margin-bottom:0}
+.variable-glossary dt{font-weight:700}
+.variable-glossary dd{margin:0;color:var(--muted);line-height:1.45}
+.decision-exercise[open]>summary{margin-bottom:16px}
+@media(max-width:550px){
+  .computer-entry form{align-items:stretch;flex-direction:column}
+  .variable-glossary dl{grid-template-columns:1fr}
+}
+.event-card p{margin-bottom:16px}
+.route-breakdown{margin-top:8px;font-size:12px}
+.route-breakdown summary{cursor:pointer;font-weight:700}
+.route-breakdown>span{display:block;margin-bottom:4px}
