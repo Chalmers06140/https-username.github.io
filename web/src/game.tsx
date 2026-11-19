@@ -357,7 +357,9 @@ export default function Game({testMode=false,emergencyMode=false}:{testMode?:boo
                 <Field label="2b. Truck price per added kilometre" hint="Add the extra driving allowance to the price for each kilometre of the shared distance." value={s.paper.truckRate} unit="SEK/km" onChange={v=>setPaper("truckRate",v)}/>
                 <Field label="2c. Break-even distance" hint="Enter the distance between terminals where both full routes cost the same." value={s.paper.critical} unit="km" onChange={v=>setPaper("critical",v)}/>
               </div>
-              <button className="primary full" onClick={submitCalculation}>CHECK ANSWERS</button>
+              <button className="primary full" onClick={canExplore?()=>go("case"):submitCalculation}>
+                {canExplore?"GO TO NEXT STEP →":"CHECK ANSWERS"}
+              </button>
               {s.calculated&&<div className="calculation-feedback" aria-live="polite">
                 <h3>{calculationPassed?"Your answers check out":"Review your calculation"}</h3>
                 <div className="answer-head"><span>Item</span><span>Your answer</span><span>Check</span></div>
@@ -365,7 +367,6 @@ export default function Game({testMode=false,emergencyMode=false}:{testMode?:boo
                 {!s.showCaseAnswer&&hints.length>0&&<div className="hint-box"><b>Hints</b>{hints.map(h=><p key={String(h)}>{h}</p>)}</div>}
                 {!s.showCaseAnswer&&<button className="text-button" onClick={()=>patch({showCaseAnswer:true})}>REVIEW WORKED SOLUTION</button>}
                 {s.showCaseAnswer&&<p>Rail Combi quote: 6.5x + 550. Complete intermodal charge: 6.5x + 550 + 2(650) + 2(240). Direct truck: 9 × 1.2 × (x + 50 + 42). The full routes cost the same at x = {base.critical.toFixed(1)} km.</p>}
-                {canExplore&&<button className="primary full" onClick={()=>go("case")}>GO TO NEXT STEP →</button>}
               </div>}
               <div className="ppt-question"><b>Class discussion · Group PPT</b>{task2Questions.map(question=><p key={question}>{question}</p>)}</div>
               <p className="micro source-foot">Source: CDIT case handout, Data Set 1, and the Task 2 teaching guide.</p>
